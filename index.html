@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Omni-Stream Workspace</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    /* Custom Scrollbar & Animations */
+    body { font-family: system-ui, -apple-system, sans-serif; }
+    
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+    
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    .animate-shimmer {
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes bounce-delay {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-25%); }
+    }
+    .typing-dot {
+      animation: bounce-delay 1s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.15s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.3s; }
+
+    /* Reusable Glass Card class for JS dynamic elements */
+    .glass-card {
+      background-color: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 1rem;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-950 via-slate-900 to-black text-slate-100 selection:bg-indigo-500/30 overflow-hidden flex flex-col md:flex-row">
+
+  <!-- Mobile Nav Bar (Bottom) / Desktop Sidebar (Left) -->
+  <nav class="order-last md:order-first w-full md:w-20 h-16 md:h-screen bg-black/40 backdrop-blur-md border-t md:border-t-0 md:border-r border-white/10 flex md:flex-col items-center justify-around md:justify-start md:py-8 z-50 shrink-0">
+    <div class="hidden md:flex w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 items-center justify-center shadow-[0_0_15px_rgba(99,102,241,0.5)] mb-8">
+      <i data-lucide="activity" class="w-6 h-6 text-white"></i>
+    </div>
+    
+    <button id="nav-workspace" class="p-3 rounded-xl transition-all bg-indigo-500/20 text-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.2)]">
+      <i data-lucide="book-open" class="w-6 h-6"></i>
+    </button>
+    <button id="nav-dashboard" class="p-3 rounded-xl transition-all md:mt-4 text-slate-400 hover:text-slate-200 hover:bg-white/5">
+      <i data-lucide="activity" class="w-6 h-6"></i>
+    </button>
+    <button id="nav-projects" class="p-3 rounded-xl transition-all md:mt-4 text-slate-400 hover:text-slate-200 hover:bg-white/5">
+      <i data-lucide="folder" class="w-6 h-6"></i>
+    </button>
+    <button id="nav-settings" class="p-3 rounded-xl transition-all md:mt-auto text-slate-400 hover:text-slate-200 hover:bg-white/5">
+      <i data-lucide="settings" class="w-6 h-6"></i>
+    </button>
+  </nav>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 h-[calc(100vh-4rem)] md:h-screen overflow-hidden p-4 md:p-6 flex flex-col">
+    
+    <!-- === WORKSPACE VIEW === -->
+    <div id="view-workspace" class="flex-1 flex flex-col lg:flex-row gap-6 h-full min-h-0">
+      
+      <!-- Editor Panel -->
+      <div class="glass-card flex-1 flex flex-col min-h-[40vh] lg:min-h-0 relative group">
+        <div class="flex items-center justify-between p-4 border-b border-white/10 bg-black/20 rounded-t-2xl">
+          <div class="flex items-center gap-2">
+            <i data-lucide="align-left" class="w-4 h-4 text-indigo-400"></i>
+            <span class="font-medium text-sm tracking-wide text-slate-300">Omni-Canvas</span>
+          </div>
+          <button id="btn-export-pdf" class="flex items-center gap-2 text-xs bg-indigo-500/20 hover:bg-indigo-500/40 text-indigo-300 px-3 py-1.5 rounded-lg transition-colors border border-indigo-500/30">
+            <i data-lucide="download" class="w-3 h-3"></i>
+            Export PDF
+          </button>
+        </div>
+        <textarea
+          id="editor-textarea"
+          placeholder="Start typing your masterpiece or paste code here..."
+          class="flex-1 w-full bg-transparent resize-none outline-none p-6 text-slate-200 leading-relaxed custom-scrollbar font-mono text-sm md:text-base"
+          spellcheck="false"
+        >## Project Alpha
+
+Start typing here...
+
+Ideas:
+- Build the core engine
+- Design the UI system</textarea>
+      </div>
+
+      <!-- AI Co-Pilot Panel -->
+      <div class="glass-card lg:w-1/3 flex flex-col min-h-[40vh] lg:min-h-0 flex-shrink-0">
+         <div class="flex items-center gap-2 p-4 border-b border-white/10 bg-black/20 rounded-t-2xl">
+            <i data-lucide="sparkles" class="w-4 h-4 text-purple-400"></i>
+            <span class="font-medium text-sm tracking-wide text-slate-300">Co-Pilot AI</span>
+         </div>
+         
+         <!-- Chat Messages -->
+         <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+           <!-- Initial Message -->
+           <div class="flex justify-start">
+             <div class="max-w-[85%] rounded-2xl px-4 py-2.5 text-sm bg-white/10 text-slate-200 border border-white/5 rounded-bl-sm">
+               <p class="whitespace-pre-wrap leading-relaxed">Hello! I'm your Omni-Stream Co-Pilot. I can see your notes on the left. How can I help you today?</p>
+             </div>
+           </div>
+         </div>
+
+         <!-- Typing Indicator (Hidden by default) -->
+         <div id="typing-indicator" class="hidden px-4 mb-2 flex justify-start">
+           <div class="bg-white/10 border border-white/5 rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1 items-center">
+             <div class="w-1.5 h-1.5 bg-purple-400 rounded-full typing-dot"></div>
+             <div class="w-1.5 h-1.5 bg-purple-400 rounded-full typing-dot"></div>
+             <div class="w-1.5 h-1.5 bg-purple-400 rounded-full typing-dot"></div>
+           </div>
+         </div>
+
+         <!-- Prompt Templates -->
+         <div class="px-4 pb-2 flex gap-2 overflow-x-auto custom-scrollbar scrollbar-hide">
+            <button class="prompt-btn whitespace-nowrap flex items-center gap-1.5 text-xs bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-3 py-1.5 transition-colors text-slate-300" data-prompt="Plan my day">
+              <i data-lucide="activity" class="w-3 h-3"></i> Plan my day
+            </button>
+            <button class="prompt-btn whitespace-nowrap flex items-center gap-1.5 text-xs bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-3 py-1.5 transition-colors text-slate-300" data-prompt="Fix bugs">
+              <i data-lucide="terminal" class="w-3 h-3"></i> Fix bugs
+            </button>
+            <button class="prompt-btn whitespace-nowrap flex items-center gap-1.5 text-xs bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-3 py-1.5 transition-colors text-slate-300" data-prompt="Summarize notes">
+              <i data-lucide="book-open" class="w-3 h-3"></i> Summarize notes
+            </button>
+         </div>
+
+         <!-- Chat Input -->
+         <div class="p-4 pt-2">
+           <div class="relative flex items-center">
+             <input
+               type="text"
+               id="chat-input"
+               placeholder="Ask the Co-Pilot..."
+               class="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-4 pr-12 text-sm outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all placeholder:text-slate-500 text-slate-200"
+             />
+             <button id="chat-send" class="absolute right-2 p-1.5 bg-indigo-500 hover:bg-indigo-600 disabled:bg-slate-700 disabled:opacity-50 text-white rounded-lg transition-colors">
+               <i data-lucide="send" class="w-4 h-4"></i>
+             </button>
+           </div>
+         </div>
+      </div>
+    </div>
+
+    <!-- === DASHBOARD VIEW === -->
+    <div id="view-dashboard" class="hidden flex-1 overflow-y-auto custom-scrollbar pr-2 pb-10 md:pb-0">
+      <header class="mb-8 mt-2">
+        <h1 class="text-3xl font-light tracking-tight flex items-center gap-3">
+          Good Evening, <span class="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Creator</span>
+        </h1>
+        <p class="text-slate-400 mt-1">Here is your live-stream progress for today.</p>
+      </header>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Gamification Widget -->
+        <div class="glass-card col-span-1 md:col-span-2 lg:col-span-2 p-6 flex flex-col justify-between relative overflow-hidden group">
+          <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4"></div>
+          
+          <div class="flex justify-between items-start mb-8 relative z-10">
+            <div>
+              <h2 class="text-lg font-medium text-slate-200 flex items-center gap-2">
+                <i data-lucide="zap" class="w-5 h-5 text-yellow-400"></i>
+                Daily Progress
+              </h2>
+              <p class="text-sm text-slate-400 mt-1">Complete tasks to level up your workflow.</p>
+            </div>
+            <div class="text-right">
+              <div id="level-display" class="text-3xl font-bold text-white">Lvl 4</div>
+              <div class="text-xs font-medium text-indigo-400 uppercase tracking-wider mt-1">Grandmaster</div>
+            </div>
+          </div>
+
+          <div class="relative z-10">
+            <div class="flex justify-between text-sm mb-2 font-medium">
+              <span id="xp-text" class="text-indigo-300">350 XP</span>
+              <span id="xp-needed-text" class="text-slate-500">500 XP</span>
+            </div>
+            <div class="w-full bg-black/40 rounded-full h-3 backdrop-blur-sm border border-white/5 overflow-hidden">
+              <div id="xp-bar" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-3 rounded-full transition-all duration-1000 ease-out relative" style="width: 70%">
+                <div class="absolute inset-0 bg-white/20 w-full h-full animate-shimmer"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hardware Monitor Mock -->
+        <div class="glass-card p-6">
+          <h2 class="text-lg font-medium text-slate-200 mb-6 flex items-center gap-2">
+            <i data-lucide="terminal" class="w-5 h-5 text-emerald-400"></i>
+            System Status
+          </h2>
+          
+          <div class="space-y-6">
+            <div>
+              <div class="flex justify-between text-sm mb-2 text-slate-400">
+                <span class="flex items-center gap-1"><i data-lucide="cpu" class="w-4 h-4"></i> CPU Load</span>
+                <span id="cpu-text" class="font-mono text-emerald-400">12%</span>
+              </div>
+              <div class="w-full bg-black/40 rounded-full h-2">
+                <div id="cpu-bar" class="bg-emerald-500/80 h-2 rounded-full transition-all duration-500" style="width: 12%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-sm mb-2 text-slate-400">
+                <span class="flex items-center gap-1"><i data-lucide="hard-drive" class="w-4 h-4"></i> RAM Usage</span>
+                <span id="ram-text" class="font-mono text-blue-400">45%</span>
+              </div>
+              <div class="w-full bg-black/40 rounded-full h-2">
+                <div id="ram-bar" class="bg-blue-500/80 h-2 rounded-full transition-all duration-500" style="width: 45%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Habits / Tasks List -->
+        <div class="glass-card col-span-1 md:col-span-2 lg:col-span-3 p-6">
+          <h2 class="text-lg font-medium text-slate-200 mb-4 flex items-center gap-2">
+            <i data-lucide="check-circle-2" class="w-5 h-5 text-purple-400"></i>
+            Active Directives
+          </h2>
+          
+          <div id="habits-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Habits rendered via JS -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- === PROJECTS VIEW === -->
+    <div id="view-projects" class="hidden flex-1 overflow-y-auto custom-scrollbar pr-2 pb-10 md:pb-0">
+      <header class="mb-8 mt-2">
+        <h1 class="text-3xl font-light tracking-tight flex items-center gap-3">
+          Your <span class="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">Projects</span>
+        </h1>
+        <p class="text-slate-400 mt-1">Manage your workspaces and notes.</p>
+      </header>
+      <div id="projects-container" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <!-- Projects rendered via JS -->
+      </div>
+    </div>
+
+    <!-- === SETTINGS VIEW === -->
+    <div id="view-settings" class="hidden flex-1 overflow-y-auto custom-scrollbar pr-2 pb-10 md:pb-0">
+      <header class="mb-8 mt-2">
+        <h1 class="text-3xl font-light tracking-tight flex items-center gap-3">
+          App <span class="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-slate-300 to-white">Settings</span>
+        </h1>
+        <p class="text-slate-400 mt-1">Configure your Omni-Stream experience.</p>
+      </header>
+      <div class="max-w-2xl space-y-6">
+        <div class="glass-card p-6">
+          <h2 class="text-lg font-medium text-slate-200 mb-4 flex items-center gap-2">
+            <i data-lucide="user" class="w-5 h-5 text-slate-400"></i> Account
+          </h2>
+          <div class="space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="text-slate-300">Username</span>
+              <span class="text-slate-400 bg-black/30 px-3 py-1 rounded-lg">Creator</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-300">Subscription</span>
+              <span class="text-indigo-400 font-medium bg-indigo-500/10 px-3 py-1 rounded-lg border border-indigo-500/20">Pro Plan</span>
+            </div>
+          </div>
+        </div>
+        <div class="glass-card p-6">
+          <h2 class="text-lg font-medium text-slate-200 mb-4 flex items-center gap-2">
+            <i data-lucide="bot" class="w-5 h-5 text-purple-400"></i> AI Co-Pilot
+          </h2>
+          <div class="space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="text-slate-300">Model</span>
+              <select class="bg-black/40 border border-white/10 rounded-lg px-3 py-1.5 text-slate-300 outline-none">
+                <option>Gemini 2.5 Flash</option>
+                <option>Gemini 2.5 Pro</option>
+              </select>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-300">Auto-Context Sync</span>
+              <div class="w-10 h-5 bg-indigo-500 rounded-full relative cursor-pointer shadow-[0_0_10px_rgba(99,102,241,0.5)]">
+                <div class="w-4 h-4 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // --- API & Config ---
+    const apiKey = ""; // Gemini API Key injected by environment
+
+    // Exponential Backoff API Fetcher
+    const fetchGeminiResponse = async (prompt, systemInstruction = "", retries = 5) => {
+      const delays = [1000, 2000, 4000, 8000, 16000];
+      
+      for (let i = 0; i < retries; i++) {
+        try {
+          const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: systemInstruction }] }
+              })
+            }
+          );
+          
+          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+          const data = await response.json();
+          return data.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
+        } catch (error) {
+          if (i === retries - 1) return `Error connecting to AI: ${error.message}. Please try again later.`;
+          await new Promise(resolve => setTimeout(resolve, delays[i]));
+        }
+      }
+    };
+
+    // --- Global State ---
+    let state = {
+      level: 4,
+      xp: 350,
+      xpNeeded: 500,
+      isTyping: false,
+      currentProjectId: 1,
+      projects: [
+        { id: 1, name: "Project Alpha", content: "## Project Alpha\n\nStart typing here...\n\nIdeas:\n- Build the core engine\n- Design the UI system", lastUpdated: "2 hours ago", iconColor: "text-blue-400" },
+        { id: 2, name: "Personal Blog", content: "## Personal Blog\n\nDrafting my first post...", lastUpdated: "1 day ago", iconColor: "text-indigo-400" },
+        { id: 3, name: "API Documentation", content: "## API Documentation\n\n- /api/users\n- /api/projects", lastUpdated: "3 days ago", iconColor: "text-purple-400" }
+      ],
+      habits: [
+        { id: 1, text: "Review daily goals", completed: false, xpReward: 50 },
+        { id: 2, text: "Write 500 words", completed: false, xpReward: 100 },
+        { id: 3, text: "Code for 1 hour", completed: false, xpReward: 150 },
+      ]
+    };
+
+    // --- DOM Elements ---
+    const navWorkspaceBtn = document.getElementById('nav-workspace');
+    const navDashboardBtn = document.getElementById('nav-dashboard');
+    const navProjectsBtn = document.getElementById('nav-projects');
+    const navSettingsBtn = document.getElementById('nav-settings');
+    
+    const viewWorkspace = document.getElementById('view-workspace');
+    const viewDashboard = document.getElementById('view-dashboard');
+    const viewProjects = document.getElementById('view-projects');
+    const viewSettings = document.getElementById('view-settings');
+    
+    const editorTextarea = document.getElementById('editor-textarea');
+    const btnExportPdf = document.getElementById('btn-export-pdf');
+    
+    const chatMessages = document.getElementById('chat-messages');
+    const chatInput = document.getElementById('chat-input');
+    const chatSendBtn = document.getElementById('chat-send');
+    const typingIndicator = document.getElementById('typing-indicator');
+    const promptBtns = document.querySelectorAll('.prompt-btn');
+
+    const xpText = document.getElementById('xp-text');
+    const levelDisplay = document.getElementById('level-display');
+    const xpBar = document.getElementById('xp-bar');
+    const habitsContainer = document.getElementById('habits-container');
+    const projectsContainer = document.getElementById('projects-container');
+
+    const cpuText = document.getElementById('cpu-text');
+    const cpuBar = document.getElementById('cpu-bar');
+    const ramText = document.getElementById('ram-text');
+    const ramBar = document.getElementById('ram-bar');
+
+    // --- Tab Navigation ---
+    const pages = [
+      { id: 'workspace', nav: navWorkspaceBtn, view: viewWorkspace },
+      { id: 'dashboard', nav: navDashboardBtn, view: viewDashboard },
+      { id: 'projects', nav: navProjectsBtn, view: viewProjects },
+      { id: 'settings', nav: navSettingsBtn, view: viewSettings }
+    ];
+
+    const switchTab = (tabId) => {
+      pages.forEach(page => {
+        if (page.id === tabId) {
+          page.view.classList.remove('hidden');
+          
+          // Apply active styles
+          page.nav.classList.add('bg-indigo-500/20', 'text-indigo-400', 'shadow-[0_0_10px_rgba(99,102,241,0.2)]');
+          page.nav.classList.remove('text-slate-400', 'hover:text-slate-200', 'hover:bg-white/5');
+        } else {
+          page.view.classList.add('hidden');
+          
+          // Apply inactive styles
+          page.nav.classList.remove('bg-indigo-500/20', 'text-indigo-400', 'shadow-[0_0_10px_rgba(99,102,241,0.2)]');
+          page.nav.classList.add('text-slate-400', 'hover:text-slate-200', 'hover:bg-white/5');
+        }
+      });
+      
+      lucide.createIcons();
+    };
+
+    navWorkspaceBtn.addEventListener('click', () => switchTab('workspace'));
+    navDashboardBtn.addEventListener('click', () => switchTab('dashboard'));
+    navProjectsBtn.addEventListener('click', () => switchTab('projects'));
+    navSettingsBtn.addEventListener('click', () => switchTab('settings'));
+
+    // --- AI Chat Logic ---
+    const appendMessage = (role, text) => {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'}`;
+      
+      const innerDiv = document.createElement('div');
+      innerDiv.className = `max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${
+        role === 'user' 
+          ? 'bg-indigo-600 text-white rounded-br-sm shadow-md' 
+          : 'bg-white/10 text-slate-200 border border-white/5 rounded-bl-sm'
+      }`;
+      
+      const p = document.createElement('p');
+      p.className = 'whitespace-pre-wrap leading-relaxed';
+      p.textContent = text;
+      
+      innerDiv.appendChild(p);
+      msgDiv.appendChild(innerDiv);
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    };
+
+    const handleSendMessage = async (overrideText = null) => {
+      const textToSend = overrideText || chatInput.value;
+      if (!textToSend.trim() || state.isTyping) return;
+
+      // Add user message
+      appendMessage('user', textToSend);
+      chatInput.value = "";
+      state.isTyping = true;
+      chatSendBtn.disabled = true;
+      typingIndicator.classList.remove('hidden');
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      // Prepare Context
+      const currentEditorText = editorTextarea.value;
+      const systemInstruction = "You are an expert AI co-pilot, integrated into the user's workspace. You are helpful, concise, and highly intelligent. You have access to the user's current editor document.";
+      const contextualPrompt = `
+        [CURRENT EDITOR CONTENT START]
+        ${currentEditorText}
+        [CURRENT EDITOR CONTENT END]
+        
+        User Request: ${textToSend}
+      `;
+
+      // Fetch AI
+      const aiResponse = await fetchGeminiResponse(contextualPrompt, systemInstruction);
+      
+      // Update DOM
+      typingIndicator.classList.add('hidden');
+      appendMessage('ai', aiResponse);
+      state.isTyping = false;
+      chatSendBtn.disabled = false;
+    };
+
+    chatSendBtn.addEventListener('click', () => handleSendMessage());
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleSendMessage();
+    });
+
+    promptBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const promptText = e.currentTarget.getAttribute('data-prompt');
+        handleSendMessage(promptText);
+      });
+    });
+
+    // --- PDF Export ---
+    btnExportPdf.addEventListener('click', () => {
+      const printWindow = window.open('', '', 'height=600,width=800');
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Omni-Stream Export</title>
+            <style>
+              body { font-family: system-ui, sans-serif; line-height: 1.6; color: #333; padding: 40px; max-width: 800px; margin: 0 auto; }
+              pre { background: #f4f4f4; padding: 15px; border-radius: 8px; overflow-x: auto; }
+              h1, h2, h3 { color: #111; }
+            </style>
+          </head>
+          <body>
+            <h2>Omni-Stream Document Export</h2>
+            <hr/>
+            <div style="white-space: pre-wrap;">${editorTextarea.value}</div>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 250);
+    });
+
+    // --- Gamification & Habits ---
+    const updateXpUI = () => {
+      xpText.textContent = `${state.xp} XP`;
+      levelDisplay.textContent = `Lvl ${state.level}`;
+      const percentage = Math.min((state.xp / state.xpNeeded) * 100, 100);
+      xpBar.style.width = `${percentage}%`;
+    };
+
+    const handleGainXp = (amount) => {
+      let newXp = state.xp + amount;
+      if (newXp >= state.xpNeeded) {
+        state.level += 1;
+        newXp = newXp - state.xpNeeded;
+      }
+      state.xp = newXp;
+      updateXpUI();
+    };
+
+    const renderHabits = () => {
+      habitsContainer.innerHTML = '';
+      state.habits.forEach(habit => {
+        const wrapper = document.createElement('div');
+        wrapper.className = `p-4 rounded-xl border transition-all cursor-pointer flex items-center gap-3 ${
+          habit.completed 
+            ? 'bg-purple-500/10 border-purple-500/30' 
+            : 'bg-white/5 border-white/5 hover:border-white/20 hover:bg-white/10'
+        }`;
+        
+        wrapper.innerHTML = `
+          <button class="flex-shrink-0 focus:outline-none">
+            ${habit.completed 
+              ? '<i data-lucide="check-circle-2" class="w-6 h-6 text-purple-400"></i>' 
+              : '<i data-lucide="circle" class="w-6 h-6 text-slate-500"></i>'}
+          </button>
+          <div class="flex-1">
+            <p class="text-sm font-medium transition-colors ${habit.completed ? 'text-slate-300 line-through opacity-70' : 'text-slate-200'}">
+              ${habit.text}
+            </p>
+            <p class="text-xs text-indigo-400 font-mono mt-0.5">+${habit.xpReward} XP</p>
+          </div>
+        `;
+        
+        wrapper.addEventListener('click', () => {
+          const isCompleting = !habit.completed;
+          habit.completed = isCompleting;
+          if (isCompleting) {
+            handleGainXp(habit.xpReward);
+          } else {
+            state.xp = Math.max(0, state.xp - habit.xpReward);
+            updateXpUI();
+          }
+          renderHabits();
+        });
+
+        habitsContainer.appendChild(wrapper);
+      });
+      lucide.createIcons();
+    };
+
+    // --- Project Management ---
+    const renderProjects = () => {
+      projectsContainer.innerHTML = '';
+      state.projects.forEach(proj => {
+        const wrapper = document.createElement('div');
+        wrapper.className = "glass-card p-6 hover:bg-white/10 transition-colors cursor-pointer group border-transparent hover:border-white/20";
+        wrapper.innerHTML = `
+          <i data-lucide="${proj.id === state.currentProjectId ? 'folder-open' : 'folder'}" class="w-8 h-8 ${proj.iconColor} mb-4 group-hover:scale-110 transition-transform"></i>
+          <h3 class="text-lg font-medium text-slate-200">${proj.name}</h3>
+          <p class="text-sm text-slate-400 mt-2">Updated ${proj.lastUpdated}</p>
+        `;
+        wrapper.addEventListener('click', () => openProject(proj.id));
+        projectsContainer.appendChild(wrapper);
+      });
+
+      const newBtn = document.createElement('div');
+      newBtn.className = "glass-card p-6 flex flex-col items-center justify-center text-slate-500 hover:text-slate-300 hover:bg-white/10 transition-colors cursor-pointer border-dashed border-2 border-white/10 hover:border-white/30";
+      newBtn.innerHTML = `
+        <i data-lucide="plus" class="w-8 h-8 mb-2"></i>
+        <span class="font-medium">New Project</span>
+      `;
+      newBtn.addEventListener('click', () => {
+        const newId = Date.now();
+        const colors = ['text-emerald-400', 'text-pink-400', 'text-yellow-400', 'text-cyan-400'];
+        state.projects.push({
+          id: newId,
+          name: "Untitled Project",
+          content: "## Untitled Project\n\nStart typing...",
+          lastUpdated: "Just now",
+          iconColor: colors[Math.floor(Math.random() * colors.length)]
+        });
+        renderProjects();
+        openProject(newId);
+      });
+      projectsContainer.appendChild(newBtn);
+      lucide.createIcons();
+    };
+
+    const openProject = (id) => {
+      state.currentProjectId = id;
+      const project = state.projects.find(p => p.id === id);
+      if (project) {
+        editorTextarea.value = project.content;
+        renderProjects(); // update folder-open icon
+        switchTab('workspace');
+      }
+    };
+
+    editorTextarea.addEventListener('input', (e) => {
+      const project = state.projects.find(p => p.id === state.currentProjectId);
+      if (project) {
+        project.content = e.target.value;
+        project.lastUpdated = "Just now";
+        
+        // Dynamically update project name if user types a Markdown header on the first line
+        const firstLine = e.target.value.split('\n')[0];
+        if (firstLine && firstLine.startsWith('#')) {
+           const newName = firstLine.replace(/^#+\s*/, '').substring(0, 25);
+           if(newName !== project.name && newName.length > 0) {
+               project.name = newName;
+               renderProjects(); 
+           }
+        }
+      }
+    });
+
+    // Initial Render
+    renderHabits();
+    updateXpUI();
+    renderProjects();
+    openProject(state.currentProjectId);
+
+    // --- Hardware Mocking ---
+    setInterval(() => {
+      const cpuLoad = Math.floor(Math.random() * 25) + 10; // 10-35%
+      const ramLoad = Math.floor(Math.random() * 10) + 40; // 40-50%
+      
+      cpuText.textContent = `${cpuLoad}%`;
+      cpuBar.style.width = `${cpuLoad}%`;
+      
+      ramText.textContent = `${ramLoad}%`;
+      ramBar.style.width = `${ramLoad}%`;
+    }, 2000);
+
+  </script>
+</body>
+</html>
